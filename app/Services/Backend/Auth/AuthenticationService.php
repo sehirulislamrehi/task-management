@@ -23,33 +23,17 @@ class AuthenticationService
                     ];
                     if (auth('web')->attempt($credentials, true)) {
                          Auth::guard('web')->login($user);
-                         return [
-                              "status" => true,
-                              "message" => "User Authenticate",
-                              "data" => [
-                                   "route" => route('dashboard')
-                              ],
-                         ];
+                         return $this->location_reload(null, "Login successfull. Redirecting please wait...", true, route('dashboard'));
                     } else {
-                         return [
-                              "status" => false,
-                              "message" => "Invalid Credentials",
-                              "data" => [],
-                         ];
+                         return $this->warning(null, "Invalid Credentials");
                     }
                } else {
-                    return [
-                         "status" => false,
-                         "message" => "Your Account is temporary disabled. Please contact with system administrator",
-                         "data" => [],
-                    ];
+                    return $this->warning(null, "Your Account is temporary disabled. Please contact with system administrator");
+
                }
           } else {
-               return [
-                    "status" => false,
-                    "message" => "No user found with the given email address",
-                    "data" => [],
-               ];
+               return $this->warning(null, "No user found with the given email address");
+
           }
      }
 

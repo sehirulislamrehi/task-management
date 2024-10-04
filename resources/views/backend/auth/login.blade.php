@@ -75,7 +75,7 @@
 
         <div class="login-wrapper wd-300 wd-xs-400 pd-25 pd-xs-40 rounded shadow-base" style="background: #363352">
 
-            <form class="login-form ajax-form mt-5" action="{{ route('do.login') }}" method="post">
+            <form class="login-form ajax-form" action="{{ route('do.login') }}" method="post">
                 @csrf
 
                 <div class="row">

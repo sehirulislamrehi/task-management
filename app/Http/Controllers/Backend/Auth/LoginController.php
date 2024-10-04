@@ -40,16 +40,8 @@ class LoginController extends Controller
                 return $this->warning("", $validator->errors()->first());
             }
             else{
-
-                $response = $this->authentication_service->do_login($request);
-                if($response['status']){
-                    return $this->location_reload(null, "Login successfull. Redirecting please wait...", true, $response['data']['route']);
-                }
-                else{
-                    return $this->warning(null, $response['message']);
-                }
+                return $this->authentication_service->do_login($request);
             }
-
         }
         catch( Exception $e ){
             return $this->error("", $e->getMessage());
