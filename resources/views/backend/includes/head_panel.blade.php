@@ -1,38 +1,36 @@
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-    </ul>
+<div class="br-header">
+     <div class="br-header-left">
+          <div class="navicon-left hidden-md-down"><a id="btnLeftMenu" href=""><i class="icon ion-navicon-round"></i></a></div>
+          <div class="navicon-left hidden-lg-up"><a id="btnLeftMenuMobile" href=""><i class="icon ion-navicon-round"></i></a></div>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-        <li class="nav-item px-3 d-flex justify-content-center align-items-center">
-            <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" id="modeSwitch">
-                <label class="custom-control-label" id="modelabel" for="modeSwitch">Dark Mode</label>
-            </div>
-        </li>
+     </div>
+     <div class="br-header-right">
+          <nav class="nav">
 
-        <li class="nav-item px-1 d-flex justify-content-center align-items-center">
-            <div class="dropdown">
-                <a class="btn btn-sm btn-outline-dark dropdown-toggle" href="#" role="button" data-toggle="dropdown"
-                   aria-expanded="false">
-                    @if (auth('super_admin')->check())
-                        <i class="fas fa-user pr-1"></i>{{ auth('super_admin')->user()->name }}
-                    @else
-                        <i class="fas fa-user pr-1"></i>{{ auth('web')->user()->fullname }}
-                    @endif
-                </a>
-                <div class="dropdown-menu dark" style="text-align: left;">
-                    <a class="btn btn-sm" href="{{route("admin.setting-module.setting.index")}}"><i class="fas fa-cog pr-3"></i>Setting</a>
-                    <form action="{{ route('admin.logout') }}" class="" method="post">
-                        @csrf
-                        <button class="btn btn-sm" type="submit"><i class="fas fa-sign-out-alt pr-3"></i>Logout</button>
-                    </form>
-                </div>
-            </div>
-        </li>
-    </ul>
-</nav>
+               <div class="dropdown">
+                    <a href="" class="nav-link nav-link-profile" data-toggle="dropdown">
+                         <img src="{{ auth('web')->user()->image ? $get_file_path .'/'. auth('web')->user()->image : asset('images/user.png') }}" class="wd-32 rounded-circle" alt="">
+                         <span class="square-10 bg-success"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-header wd-250" x-placement="top-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-65px, 1px, 0px);">
+                         <div class="tx-center">
+                              <!-- <a href=""><img src="../img/img1.jpg" class="wd-80 rounded-circle" alt=""></a> -->
+                              <h6 class="logged-fullname">{{ auth('web')->check() ? auth('web')->user()->name : "" }}</h6>
+                              <p>{{ auth('web')->check() ? auth('web')->user()->email : "" }}</p>
+                         </div>
+                         <hr>
+                         <ul class="list-unstyled user-profile-nav">
+                              <li><a href="{{ route('user.edit.my.profile.page') }}"><i class="icon ion-ios-person"></i> Edit Profile</a></li>
+                              <li>
+                                   <a href="#" onclick="document.getElementById('logout-form').submit()">
+                                        <i class="icon ion-power"></i> 
+                                        Sign Out
+                                        <form action="{{route('do.logout')}}" method="post" id="logout-form">@csrf</form>
+                                   </a>
+                              </li>
+                         </ul>
+                    </div>
+               </div>
+          </nav>
+     </div>
+</div>

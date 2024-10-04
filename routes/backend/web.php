@@ -1,32 +1,20 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticationController;
-use App\Http\Controllers\Backend\DashboardModule\DashboardController;
-use App\Http\Controllers\Backend\UtilityController;
+use App\Http\Controllers\Backend\DashboardController;
 use Illuminate\Support\Facades\Route;
 
+require_once "auth.php";
 
-Route::get('/', [AuthenticationController::class, 'show_login'])->name('admin.show-login');
-Route::post('/do-login', [AuthenticationController::class, 'do_login'])->name('admin.do-login');
-Route::get('/dev-mode', [AuthenticationController::class, 'show_dev_mode_login'])->name('admin.show-dev-mode');
+//backend route group start
+Route::group(['prefix' => 'admindashboard', 'middleware' => 'admin_auth'], function () {
 
-Route::middleware('auth')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-
-        //Dashboard
-        Route::get("dashboard", [DashboardController::class, 'index'])->name("dashboard.index");
-
-        //User module
-        Route::prefix("user-module")->name('user-module.')->group(function () {
-            //user
-            require_once 'user_module/user.php';
-            //Role
-            require_once 'user_module/role.php';
-        });
+    Route::group(['prefix' => 'user-module'], function(){
+        require_once "user_module/role.php";
+        require_once "user_module/user.php";
     });
 
 });
 
-
-
+?>

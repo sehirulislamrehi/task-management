@@ -18,7 +18,9 @@ class CreatePermissionsTable extends Migration
             $table->string('key')->unique();
             $table->string('display_name');
             $table->unsignedBigInteger('module_id');
+
             $table->foreign("module_id")->references("id")->on("modules")->onDelete("cascade");
+
             $table->timestamps();
         });
     }

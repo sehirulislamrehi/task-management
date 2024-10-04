@@ -6,9 +6,10 @@ $(document).ready(function () {
     });
 
 
+
     $(document).on('submit', '.ajax-form', function (e) {
         e.preventDefault()
-        $(".loader").show()
+        $(".loading").show()
 
         let $this = $(this);
         let formData = new FormData(this);
@@ -24,63 +25,54 @@ $(document).ready(function () {
             processData: false,
             cache: false,
             success: function (response) {
-                successResponseProcess(response, true, true)
-            },
+                $(".loading").hide()
+                // if (response.redirect) {
+                //     swal('', `${response.message}`, `${response.status}`)
+                //     setTimeout(function () {
+                //         return window.location.href = response.redirect
+                //     }, 1000);
+                // }
+                // else if (response.login) {
+                //     swal("Login Successfully Done", "Redirecting Please Wait", "success")
+                //     return window.location.href = response.login
+                // }
+                // else if (response.location_reload) {
+                //     swal('', `${response.location_reload}`, `${response.status}`)
+                //     return location.reload()
+                // }
 
+                if( response.location_reload == true ){
+                    swal('', `${response.message}`, `${response.status}`)
+                    setTimeout(function () {
+                        return window.location.href = response.url
+                    }, 1000);
+                }
+                else {
+                    swal('', `${response.message}`, `${response.status}`)
+                    if ($("#datatable").length) {
+                        $("#datatable").DataTable().ajax.reload();
+                    }
+                }
+
+            },
             error: function (response) {
-                errorResponseProcess(response, true, true)
+                $(".loading").hide()
+                if (response.status === 500) {
+                    let error = JSON.parse(response.responseText);
+                    swal('', `${error.message}`, `${error.status}`)
+                }
+                else {
+                    let data = JSON.parse(response.responseText);
+                    $.each(data.errors, (key, value) => {
+                        swal("", `${value}`, "warning");
+                        $("[name^=" + key + "]").parent().addClass('has-error')
+                        $("[name^=" + key + "]").parent().append('<small class="danger text-muted form-errors">' + value[0] + '</small>');
+                    })
+                }
+                console.clear()
             }
         })
     })
 
 
 })
-
-function successResponseProcess(response,modalHide, dbReload) {
-    $(".loader").hide();
-
-    if(response.status == "success"){
-        toastr.success(response.message);
-
-        if(modalHide){
-            $("#myModal").modal('hide');
-            $("#largeModal").modal('hide');
-        }
-        if(dbReload){
-            if ($("#dataGrid").length && $.fn.DataTable.isDataTable("#dataGrid")) {
-                $("#dataGrid").DataTable().ajax.reload();
-            }
-        }
-    }
-    if (response.hasOwnProperty('status') && (response.status === 'error' || response.status === 'warning' || response.status === 'info')) {
-
-        $(".loader").hide();
-        if (response.status === 'error') {
-            toastr.error(response.message);
-        } else if (response.status === 'warning') {
-            toastr.warning(response.message);
-        } else if (response.status === 'info') {
-            toastr.info(response.message);
-        } else {
-            // Handle other alert types or defaults here
-        }
-    } 
-}
-
-function errorResponseProcess(response, modalHide, dbReload) {
-    $(".loader").hide()
-    if (response.status === 500) {
-        let error = JSON.parse(response.responseText);
-        toastr.error('Internal Server Error');
-    } else if (response.status === 503) {
-        toastr.error('Service Unavailable');
-    } else {
-        let data = JSON.parse(response.responseText);
-        toastr.error('Unprocessable content');
-        $.each(data.errors, (key, value) => {
-            $("[name^=" + key + "]").parent().addClass('text-danger')
-            $("[name^=" + key + "]").parent().append('<small class="text-danger text-danger form-errors">' + value[0] + '</small>');
-            console.log($("[name^=" + key + "]").parent());
-        })
-    }
-}

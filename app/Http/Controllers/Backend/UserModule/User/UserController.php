@@ -2,258 +2,425 @@
 
 namespace App\Http\Controllers\Backend\UserModule\User;
 
-use App\Enum\UserGroupEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Backend\UserModule\User\UserCreateRequest;
-use App\Http\Requests\Backend\UserModule\User\UserUpdateRequest;
-use App\Models\Backend\CommonModule\BusinessUnit;
-use App\Models\Backend\CommonModule\ServiceCenter;
-use App\Models\Backend\UserModule\AgentType;
-use App\Models\Backend\UserModule\User;
-use App\Services\Backend\CommonService\OthobaDepartment\OthobaDepartmentService;
-use App\Services\Backend\DatatableServices\UserModule\User\UserDatatableService;
-use App\Services\Backend\ModuleServices\UserModule\User\UserService;
+use App\Models\UserModule\BuySell;
+use App\Models\PriceCoverage\Prefix;
+use App\Models\UserModule\Role;
+use App\Models\Reports\Transaction;
+use App\Models\UserModule\User;
+use App\Models\UserModule\Validity;
 use App\Traits\ApiResponseTrait;
+use App\Traits\FilePathTrait;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
 
-    use ApiResponseTrait;
-
-    protected UserService $userService;
-    protected UserDatatableService $userDatatableService;
-    protected OthobaDepartmentService $othobaDepartmentService;
+    use ApiResponseTrait, FilePathTrait;
 
     /**
-     * @param UserService $userService
-     * @param UserDatatableService $userDatatableService
-     * @param OthobaDepartmentService $othobaDepartmentService
-     */
-    public function __construct(UserService $userService, UserDatatableService $userDatatableService, OthobaDepartmentService $othobaDepartmentService)
-    {
-        $this->userService = $userService;
-        $this->userDatatableService = $userDatatableService;
-        $this->othobaDepartmentService = $othobaDepartmentService;
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method index
+     **/
+    public function index(){
+        if( can('all_user') ){
+            return view("backend.modules.user_module.user.index");
+        }else{
+            return view("errors.403");
+        }
     }
 
-
-    function index(): View
-    {
-        if (can('user_index')) {
-            if (auth('super_admin')->check()) {
-                $businessUnits = BusinessUnit::all();
-                $serviceCenters = ServiceCenter::all();
-            } else {
-                $userId = auth('web')->user()->id;
-                $user = User::find($userId);
-                if ($user->user_group->id == UserGroupEnum::ADMIN->value && count(isAdminBusinessUnitAccess()) == 0) {
-                    $businessUnits = BusinessUnit::all();
-                    $serviceCenters = ServiceCenter::all();
-                } elseif ($user->user_group->id == UserGroupEnum::ADMIN->value && count(isAdminBusinessUnitAccess()) > 0) {
-                    $userBusinessUnits = DB::table("business_unit_user")->where("user_id", $user->id)->pluck("business_unit_id")->toArray();
-                    $businessUnits = BusinessUnit::whereIn("id", $userBusinessUnits)->get();
-                    $businessUnitServiceCenters = DB::table('business_unit_service_center')->whereIn("business_unit_id", $userBusinessUnits)->pluck("service_center_id")->toArray();
-                    $serviceCenters = ServiceCenter::whereIn("id", $businessUnitServiceCenters)->get();
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method data
+     **/
+    public function data(){
+        if( can('all_user') ){
+            
+            $user = User::orderBy('id', 'desc')->select("id","name","email","phone","is_active","role_id","image")->with("role");
+            
+            return DataTables::of($user)
+            ->addIndexColumn()
+            ->rawColumns(['action','is_active','role_id','image'])
+            ->editColumn('image', function(User $user){
+                if( $user->image == null ){
+                    $src = asset("images/profile/user.png");
+                }
+                else{
+                    $src = asset($this->get_file_path("profile")) .'/'. $user->image;
+                }
+                
+                return "
+                    <img src='$src' width='25px' style='border-radius: 100%'>
+                ";
+            })
+            ->editColumn('role_id', function (User $user) {
+                return $user->role_id ? $user->role->name : '';
+            })
+            ->editColumn('is_active', function (User $user) {
+                if ($user->is_active == true) {
+                    return '<p class="badge badge-success">Active</p>';
                 } else {
-                    $userBusinessUnits = DB::table("business_unit_user")->where("user_id", $user->id)->pluck("business_unit_id")->toArray();
-                    $businessUnits = BusinessUnit::whereIn("id", $userBusinessUnits)->get();
-                    $businessUnitServiceCenters = DB::table('business_unit_service_center')->whereIn("business_unit_id", $userBusinessUnits)->pluck("service_center_id")->toArray();
-                    $serviceCenters = ServiceCenter::whereIn("id", $businessUnitServiceCenters)->get();
+                    return '<p class="badge badge-danger">Inactive</p>';
                 }
+            })
+            ->addColumn('action', function (User $user) {
+                return '
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown'.$user->id.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Action
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdown'.$user->id.'">
+                    
+                        '.( can("edit_user") ? '
+                        <a class="dropdown-item" href="#" data-content="'.route('user.edit',$user->id).'" data-target="#myModal" class="btn btn-outline-dark" data-toggle="modal">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </a>
+                        ': '') .'
 
+                        '.( can("reset_password") ? '
+                        <a class="dropdown-item" href="#" data-content="'.route('user.reset.modal',$user->id).'" data-target="#myModal" data-toggle="modal">
+                            <i class="fas fa-key"></i>
+                            Reset Password
+                        </a>
+                        ': '') .'
+
+                    </div>
+                </div>
+                ';
+            })
+            ->make(true);
+        }else{
+            return unauthorized();
+        }
+    }
+
+
+   /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method add_modal
+     **/
+    public function add_modal(){
+        try{
+            if( can('add_user') ){
+                $roles = Role::select("id","name")->where("is_active", true)->get();
+
+                return view("backend.modules.user_module.user.modals.add", compact("roles"));
             }
-
-            $user_groups = $this->userService->getUserGroups();
-            $othobaDepartmentServices = $this->othobaDepartmentService->getAllOthobaDepartment();
-
-            return view('backend.modules.user_module.user.index', compact('businessUnits', 'serviceCenters', 'user_groups','othobaDepartmentServices'));
-        }
-        return view('error.403');
-    }
-
-
-    function data(Request $request): \Illuminate\Http\JsonResponse
-    {
-        if (can('user_index')) {
-            // dd($this->userService->getAllUser($request->only('business_unit_id', 'service_center_id')));
-            $data = $this->userService->getAllUser($request->only('business_unit_id', 'service_center_id', 'user_group_id','othoba_department_id'));
-            return $this->userDatatableService->getUserData($data);
-        }
-        $alert = array(
-            'message' => 'Unauthorized',
-            'status' => 'error'
-        );
-        return response()->json($alert);
-    }
-
-    function create(UserCreateRequest $request): \Illuminate\Http\JsonResponse
-    {
-        if (can('user_index')) {
-            $request->validated();
-            try {
-
-                $response = $this->userService->createUser($request);
-
-                if( $response['status'] == true ){
-                    return $this->success(null, $response['message']);
-                }
-                else{
-                    return $this->error(null, $response['message']);
-                }
-
-                // $alert = array(
-                //     'message' => 'Successfully saved',
-                //     'status' => 'success'
-                // );
-                // return response()->json($alert);
-
-            } catch (\Throwable $th) {
-                $alert = array(
-                    'message' => $th->getMessage(),
-                    'status' => 'error'
-                );
-                return response()->json($alert);
-
+            else{
+                return unauthorized();
             }
         }
-        $alert = array(
-            'message' => 'Unauthorized',
-            'status' => 'error'
-        );
-        return response()->json($alert);
-    }
-
-    public function edit($id): View
-    {
-        if (can('user_index')) {
-            $user = $this->userService->getUserDetails($id);
-            $groups = $this->userService->getUserGroups();
-            $roles = $this->userService->getRoles();
-            $service_centers = $this->userService->getServiceCenters();
-            $selected_service_center = $this->userService->userSelectedServiceCenter($user);
-            $selected_business_unit = $this->userService->userSelectedBusinessUnit($user);
-            $business_units = $this->userService->getBusinessUnit();
-            $agent_types = AgentType::where('is_active', true)->get();
-            $othobaDepartmentServices = $this->othobaDepartmentService->getAllOthobaDepartment();
-
-            return view('backend.modules.user_module.user.modals.edit', compact('user', 'groups', 'roles', 'service_centers', 'selected_service_center', 'selected_business_unit', 'business_units', 'agent_types', 'othobaDepartmentServices'));
+        catch( Exception $e ){
+            return $e->getMessage();
         }
-        return view('error.modals.403');
     }
 
-
-    public function update(UserUpdateRequest $request, int $id): \Illuminate\Http\JsonResponse
-    {
-        if (can('user_index')) {
-            $user = User::findOrFail($id);
-            $request->validated();
-            try {
-                $response = $this->userService->updateUser($request, $user);
-
-                if( $response['status'] == true ){
-                    return $this->success(null, $response['message']);
-                }
-                else{
-                    return $this->error(null, $response['message']);
-                }
-
-                // $alert = array(
-                //     'message' => 'Successfully Done',
-                //     'status' => 'success'
-                // );
-                // return response()->json($alert);
-
-            } catch (\Throwable $th) {
-                $alert = array(
-                    'message' => $th->getMessage(),
-                    'status' => 'error'
-                );
-                return response()->json($alert);
-            }
-
-        }
-        $alert = array(
-            'message' => 'Unauthorized',
-            'status' => 'error'
-        );
-        return response()->json($alert);
-    }
-
-    public function create_modal(): View
-    {
-        if (can('user_index')) {
-            $user_groups = $this->userService->getUserGroups();
-            $roles = $this->userService->getRoles();
-            $service_centers = $this->userService->getServiceCenters();
-            $business_units = $this->userService->getBusinessUnit();
-            $othobaDepartmentServices = $this->othobaDepartmentService->getAllOthobaDepartment();
-
-            return view('backend.modules.user_module.user.modals.create', compact('user_groups', 'roles', 'service_centers', 'business_units','othobaDepartmentServices'));
-        }
-        return view('error.modals.403');
-    }
-
-
-    public function getServiceCenterByBu(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $selectedBu = $request->input("selectedBu");
-        $data = DB::table('service_centers')
-            ->join("business_unit_service_center", 'service_centers.id', "=", 'business_unit_service_center.service_center_id')
-            ->join('business_units', "business_units.id", "=", "business_unit_service_center.business_unit_id")
-            ->select('service_centers.id', 'service_centers.name')
-            ->whereIn("business_units.id", $selectedBu)
-            ->get();
-        return response()->json($data);
-    }
-
-    public function passwordResetModal($user_id): View
-    {
-        if (can('user_index')) {
-            $user = User::select('id', 'fullname')->findOrFail($user_id);
-            return view('backend.modules.user_module.user.modals.password_reset', compact('user'));
-        }
-        return view('error.modals.403');
-    }
-
-    public function resetPassword(Request $request): \Illuminate\Http\JsonResponse
-    {
-        if (can('user_index') && can('password_reset')) {
-            $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'password' => "required|min:6",
-                'password_confirmation' => "required|same:password"
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method add
+     **/
+    public function add(Request $request){
+        if( can('add_user') ){
+            $validator = Validator::make($request->all(),[
+                'name' => 'required',
+                'email' => 'required|unique:users,email',
+                'role_id' => 'required|exists:roles,id',
+                'phone' => 'required|numeric',
+                'password' => 'required|confirmed',
             ]);
+            
 
-            $user = User::find($request['user_id']);
-            $user->password = Hash::make($request['password']);
-            $user->save();
-            $alert = array(
-                'message' => 'Password Reset Successful',
-                'status' => 'success'
-            );
-            return response()->json($alert);
+           if( $validator->fails() ){
+               return response()->json(['errors' => $validator->errors()] ,422);
+           }else{
+                try{
+                    $user = new User();
+                    $user->name = $request->name;
+                    $user->email  = $request->email;
+                    $user->phone = $request->phone;
+                    $user->role_id = $request->role_id;
+                    $user->password = Hash::make($request->password);
+                    $user->is_active = true;
+                    
+                    if( $user->save() ){
+                        return $this->success(null, 'New user created');
+                    }
+
+                }catch( Exception $e ){
+                    return $this->error(null, $e->getMessage());
+                }
+           }
+        }else{
+            return $this->warning(null,unauthorized());
         }
-        $alert = array(
-            'message' => 'Unauthorized',
-            'status' => 'error'
-        );
-        return response()->json($alert);
     }
 
-    public function getAgentType(): \Illuminate\Http\JsonResponse
-    {
-        if (can('user_index')) {
-            $result = DB::table('agent_types')->select('id', 'agent_type')->where('is_active', true)->get();
-            return response()->json($result);
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method edit
+     **/
+    public function edit($id){
+        try{
+            if( can("edit_user") ){
+                $user = User::where("id",$id)->select("name","email","phone","role_id","is_active","id")->first();
+    
+                if(!$user){
+                    return "User not found";
+                }
+    
+                $roles = Role::select("id","name")->where("is_active", true)->get();
+    
+                return view("backend.modules.user_module.user.modals.edit", compact("user","roles"));
+            }
+            else{
+                return unauthorized();
+            }
         }
-        return response()->json([
-            'message' => 'Unauthorized',
-            'status' => 'error'
-        ]);
+        catch( Exception $e ){
+            return $e->getMessage();
+        }
     }
 
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method update
+     **/
+    public function update(Request $request, $id){
+        if( can('edit_user') ){
+            
+            $validator = Validator::make($request->all(),[
+                'is_active' => 'required',
+                'name' => 'required',
+                'phone' => 'required|numeric',
+                'role_id' => 'required|exists:roles,id',
+           ]);
+
+           if( $validator->fails() ){
+               return response()->json(['errors' => $validator->errors()] ,422);
+           }else{
+                try{
+                    $user = User::find($id);
+
+                    if(!$user){
+                        return $this->warning(null, "User not found");
+                    }
+
+                    $user->is_active = $request->is_active;
+                    $user->name = $request->name;
+                    $user->phone = $request->phone;
+                    $user->role_id = $request->role_id;
+
+                    if( $user->save() ){
+                        return $this->success(null, "Account updated");
+                    }
+                }catch( Exception $e ){
+                    return $this->error(null, $e->getMessage());
+                }
+           }
+        }else{
+            return $this->warning(null, unauthorized());
+        }
+    }
+
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method reset_modal
+     **/
+    public function reset_modal($id){
+        try{
+            if( can("reset_password") ){
+                $user = User::find($id);
+                if(!$user){
+                    return "No user found";
+                }
+                return view("backend.modules.user_module.user.modals.reset", compact("user"));
+            }
+            else{
+                return unauthorized();
+            }
+        }
+        catch( Exception $e ){
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method reset_modal
+     **/
+    public function reset($id, Request $request){
+        if( can("reset_password") ){
+            $validator = Validator::make($request->all(),[
+                'password' => 'required|confirmed',
+           ]);
+
+           if( $validator->fails() ){
+               return response()->json(['errors' => $validator->errors()] ,422);
+           }else{
+                try{
+                    $user = User::find($id);
+
+                    if(!$user){
+                        return $this->warning(null, "User not found");
+                    }
+
+                    $user->password = Hash::make($request->password);
+
+                    if( $user->save() ){
+                        return $this->success(null, "Password updated");
+                    }
+                }catch( Exception $e ){
+                    return $this->error(null, $e->getMessage());
+                }
+           }
+            
+        }
+        else{
+            return $this->warning(null,unauthorized());
+        }
+    }
+
+
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method edit_my_profile_page
+     **/
+    public function edit_my_profile_page(){
+        try{
+            $auth = auth('web')->user();
+            $get_file_path = asset($this->get_file_path("profile"));
+            $image = $get_file_path .'/'. (isset($auth->image) ? $auth->image : 'user.png');
+
+            return view("backend.modules.user_module.user.pages.edit_my_profile", compact("auth","image"));
+        }
+        catch( Exception $e ){
+            return back()->with('error', $e->getMessage());
+        }
+    }
+    
+
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method edit_my_profile
+     **/
+    public function edit_my_profile(Request $request){
+        $validator = Validator::make($request->all(),[
+            'name' => 'required',
+            'email' => 'required|unique:users,email,'. auth('web')->user()->id,
+            'phone' => 'required|numeric',
+       ]);
+
+       if( $validator->fails() ){
+           return response()->json(['errors' => $validator->errors()] ,422);
+       }else{
+            try{
+                $user = User::find(auth('web')->user()->id);
+
+                if(!$user){
+                    return $this->warning(null, "User not found");
+                }
+
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->phone = $request->phone;
+
+                if ($request->file) {
+                    $profile_image_path = public_path($this->get_file_path("profile"));
+                    if (File::exists($profile_image_path . $user->image)) {
+                        File::delete($profile_image_path . $user->image);
+                    }
+                    $image = $request->file('file');
+                    $img = time() . Str::random(5) . '.' . $image->getClientOriginalExtension();
+                    $image->move($profile_image_path, $img);
+                    $user->image = $img;
+                }
+
+                if( $user->save() ){
+                    return $this->success(null, "Account updated");
+                }
+            }catch( Exception $e ){
+                return $this->error(null, $e->getMessage());
+            }
+       }
+    }
+
+
+    /**
+     *** WARNING: !!! While changing the function please, care with extra caution. !!!
+     *** WARNING: !!! Don't forget to use proper validation and error handling. !!!
+     *** @copyright 2024
+     *** @author Md Sehirul Islam Rehi <mdsehirulislamrehi@gmail.com>
+     *** @method edit_my_password
+     **/
+    public function edit_my_password(Request $request){
+        $validator = Validator::make($request->all(),[
+            'old_password' => 'required',
+            'password' => 'required|confirmed',
+       ]);
+
+       if( $validator->fails() ){
+           return response()->json(['errors' => $validator->errors()] ,422);
+       }else{
+            try{
+                $user = User::find(auth('web')->user()->id);
+
+                if(!$user){
+                    return $this->warning(null, "User not found");
+                }
+
+                if( Hash::check($request->old_password, $user->password) ){
+                    $user->password = Hash::make($request->password);
+                    if( $user->save() ){
+                        return $this->success(null, "Password changed");
+                    }
+                }
+                else{
+                    return $this->warning(null, "Old password not matched");
+                }
+
+                
+            }catch( Exception $e ){
+                return $this->error(null, $e->getMessage());
+            }
+       }
+    }
 }

@@ -1,11 +1,15 @@
-<!-- Google Font: Source Sans Pro -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-<!-- Font Awesome Icons -->
-<link rel="stylesheet" href="{{ asset('backend/css/fontawesome-free/css/all.css')}}">
-<!-- Toaster alert-->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet">
-@yield('per_page_css')
-<!-- Theme style -->
-<link rel="stylesheet" href="{{ asset('backend/css/adminlte.css') }}">
-<!-- For our customization -->
-<link rel="stylesheet" href="{{ asset('backend/css/my_style.css') }}">
+
+<link rel="shortcut icon" href="{{ asset('images/fav.JPG') }}">
+
+<!-- vendor css -->
+<link href="{{ asset('backend/lib/@fortawesome/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+<link href="{{ asset('backend/lib/ionicons/css/ionicons.min.css') }}" rel="stylesheet">
+<link href="{{ asset('backend/lib/rickshaw/rickshaw.min.css') }}" rel="stylesheet">
+<link href="{{ asset('backend/lib/select2/css/select2.min.css') }}" rel="stylesheet">
+
+<!-- Bracket CSS -->
+<link rel="stylesheet" href="{{ asset('backend/css/brackets/bracket.css') }}">
+<link rel="stylesheet" href="{{ asset('backend/css/loader.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ asset('backend/css/custom.css') }}">
+
+@yield("per_page_css")

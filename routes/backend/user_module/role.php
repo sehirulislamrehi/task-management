@@ -1,14 +1,19 @@
 <?php
 
-
 use App\Http\Controllers\Backend\UserModule\Role\RoleController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('role')->name('role.')->controller(RoleController::class)->group(function(){
-    Route::get("/",'index')->name('index');
-    Route::get("/data",'data')->name('data');
-    Route::get('create-modal','create_modal')->name('modal.create');
-    Route::post("/create",'create')->name('create');
-    Route::get("/edit-modal/{id}",'edit_modal')->name('modal.edit');
-    Route::put("/update/{id}",'update')->name('update');
-});
+
+    //role start
+    Route::group(['prefix' => 'role'], function(){
+        Route::get("/",[RoleController::class,'index'])->name('role.all');
+        Route::get("/data",[RoleController::class,'data'])->name('role.data');
+        Route::get("/add",[RoleController::class,'add_modal'])->name('role.add.modal');
+        Route::post("/add",[RoleController::class,'add'])->name('role.add');
+        Route::get("/edit/{id}",[RoleController::class,'edit'])->name('role.edit');
+        Route::post("/update/{id}",[RoleController::class,'update'])->name('role.update');
+    });
+    //role end
+
+
+?>

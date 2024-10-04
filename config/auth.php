@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Backend\UserModule\SuperAdmin;
-use App\Models\Backend\UserModule\User;
+use App\Models\UserModule\SuperAdmin;
+use App\Models\UserModule\User;
 
 return [
 
@@ -10,8 +10,8 @@ return [
     | Authentication Defaults
     |--------------------------------------------------------------------------
     |
-    | This option controls the default authentication "guard" and password
-    | reset options for your application. You may change these defaults
+    | This option defines the default authentication "guard" and password
+    | reset "broker" for your application. You may change these values
     | as required, but they're a perfect start for most applications.
     |
     */
@@ -28,11 +28,11 @@ return [
     |
     | Next, you may define every authentication guard for your application.
     | Of course, a great default configuration has been defined for you
-    | here which uses session storage and the Eloquent user provider.
+    | which utilizes session storage plus the Eloquent user provider.
     |
-    | All authentication drivers have a user provider. This defines how the
+    | All authentication guards have a user provider, which defines how the
     | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
+    | system used by the application. Typically, Eloquent is utilized.
     |
     | Supported: "session"
     |
@@ -43,10 +43,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'super_admin' => [
-            'driver' => 'session',
-            'provider' => 'super_admins',
-        ],
     ],
 
     /*
@@ -54,12 +50,12 @@ return [
     | User Providers
     |--------------------------------------------------------------------------
     |
-    | All authentication drivers have a user provider. This defines how the
+    | All authentication guards have a user provider, which defines how the
     | users are actually retrieved out of your database or other storage
-    | mechanisms used by this application to persist your user's data.
+    | system used by the application. Typically, Eloquent is utilized.
     |
     | If you have multiple user tables or models you may configure multiple
-    | sources which represent each model / table. These sources may then
+    | providers to represent the model / table. These providers may then
     | be assigned to any extra authentication guards you have defined.
     |
     | Supported: "database", "eloquent"
@@ -70,16 +66,7 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => User::class,
-        ],
-        'super_admins' => [
-            'driver' => 'eloquent',
-            'model' => SuperAdmin::class,
-        ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        ]
     ],
 
     /*
@@ -87,9 +74,9 @@ return [
     | Resetting Passwords
     |--------------------------------------------------------------------------
     |
-    | You may specify multiple password reset configurations if you have more
-    | than one user table or model in the application and you want to have
-    | separate password reset settings based on the specific user types.
+    | These configuration options specify the behavior of Laravel's password
+    | reset functionality, including the table utilized for token storage
+    | and the user provider that is invoked to actually retrieve users.
     |
     | The expiry time is the number of minutes that each reset token will be
     | considered valid. This security feature keeps tokens short-lived so
@@ -107,13 +94,7 @@ return [
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
-        ],
-        'super_admins' => [
-            'provider' => 'super_admins',
-            'table' => 'password_resets',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
+        ]
     ],
 
     /*
@@ -122,11 +103,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may define the amount of seconds before a password confirmation
-    | times out and the user is prompted to re-enter their password via the
+    | window expires and users are asked to re-enter their password via the
     | confirmation screen. By default, the timeout lasts for three hours.
     |
     */
 
-    'password_timeout' => 10800,
+    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
 ];

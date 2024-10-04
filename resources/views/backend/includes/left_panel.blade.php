@@ -1,128 +1,95 @@
-<aside class="main-sidebar elevation-4 sidebar-dark-lightblue">
-    <!-- Brand Logo -->
-    <a href="{{ route('admin.dashboard.index') }}" class="brand-link text-center">
-        <span class="brand-text font-weight-light"><b>CRM</b><sub>v-1.0</sub></span>
-    </a>
+<div class="br-logo">
+     <a href="{{ route('dashboard') }}">
+          <img src="{{ asset('images/logo.webp') }}" class="left-panel-logo" alt="Company Logo">
+     </a>
+</div>
+<div class="br-sideleft sideleft-scrollbar">
+     <label class="sidebar-label pd-x-10 mg-t-20 op-3"></label>
+     <ul class="br-sideleft-menu">
 
-    <!-- Sidebar -->
-    <div class="sidebar os-theme-dark">
-        <!-- Sidebar Menu -->
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
+          <!-- dashboard -->
+          <li class="br-menu-item">
+               <a href="{{ route('dashboard') }}" @if( Route::currentRouteName()=='dashboard' ) class="br-menu-link active" @else class="br-menu-link" @endif>
+                    <i class="menu-item-icon fas fa-tachometer-alt"></i>
+                    <span class="menu-item-label">Dashboard</span>
+               </a>
+          </li>
 
-            <li class="nav-item">
-                <a href="{{ route('admin.dashboard.index') }}"
-                   class="nav-link {{ Route::currentRouteName()=='admin.dashboard.index' ? 'active':'' }}">
-                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                    <p>
-                        Dashboard
-                    </p>
-                </a>
-            </li>
-
-            @php
-                if( auth('super_admin')->check() ){
-                    $username = "19119";
-                }
-                else{
-                    $username = auth('web')->user()->username;
-                }
-                
-            @endphp
-            <li class="nav-item">
-                <a href="{{ route('ticket.agent') }}?phone_number=11111111111&agent={{$username}}&channel=9613737777"
-                   class="nav-link " target="blank">
-                    <i class="nav-icon fas fa-plus"></i>
-                    <p>
-                        Create Ticket
-                    </p>
-                </a>
-            </li>
-            @if( auth('super_admin')->check() )
-                @foreach( \App\Models\Backend\UserModule\Module::orderBy('position','asc')->get() as $module )
-                    @if( $module->route == null )
-                        <li class="nav-item {{ get_active_module($module,Route::currentRouteName()) }}">
-                            <a href="#" class="nav-link {{ get_sub_module($module,Route::currentRouteName()) }}">
-                                <i class="nav-icon {{ $module->icon }}"></i>
-                                <p class="menu-item-label">{{ $module->name }}
-                                    <i class="fas fa-angle-left right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                @foreach( $module->sub_module->sortBy('position',false) as $sub_module )
-                                    <li class="nav-item">
-                                        <a href="{{ route($sub_module->route) }}"
-                                           class="nav-link {{ Route::currentRouteName()==$sub_module->route ? 'active':'' }}">
-                                            <i class="far fa-circle nav-icon"></i>
-                                            <p>{{ ($sub_module->name) }} </p>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </li>
+          @if( auth('web')->check() && auth('web')->user()->is_super_admin == true )
+          @foreach( App\Models\UserModule\Module::orderBy('position','asc')->get() as $module )
+          @if( $module->route == null )
+          <li class="br-menu-item">
+               <a href="#" class="br-menu-link with-sub">
+                    <i class="menu-item-icon {{ $module->icon }}"></i>
+                    <span class="menu-item-label">{{ $module->name }}</span>
+               </a>
+               <ul class="br-menu-sub" @if( in_array(Route::currentRouteName(), $module->sub_module->pluck("route")->toArray()) ) style="display: block" @endif >
+                    @foreach( $module->sub_module->sortBy('position',false) as $sub_module )
+                    <li class="sub-item">
+                         <a href="{{ route($sub_module->route) }}" @if( Route::currentRouteName()==$sub_module->route )
+                              class="sub-link active"
+                              @else
+                              class="sub-link"
+                              @endif
+                              >{{ $sub_module->name }} </a>
+                    </li>
+                    @endforeach
+               </ul>
+          </li>
+          @else
+          <li class="br-menu-item">
+               <a href="{{ route($module->route) }}" @if( Route::currentRouteName()==$module->route )
+                    class="br-menu-link active"
                     @else
-                        <li class="nav-item">
-                            <a href="{{ route($module->route) }}"
-                               @if( Route::currentRouteName()==$module->route )
-                                   class="nav-link active"
-                               @else
-                                   class="nav-link"
-                                @endif
-                            >
-                                <i class="menu-item-icon {{ $module->icon }}"></i>
-                                <span class="menu-item-label">{{ $module->name }}</span>
-                            </a>
-                            <a href="{{ route($module->route) }}"
-                               class="nav-link {{ Route::currentRouteName()==$module->route ? 'active':'' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>{{ $module->name }}</p>
-                            </a>
-                        </li>
+                    class="br-menu-link"
                     @endif
-                @endforeach
-            @elseif( auth('web')->check() )
-                @foreach( \App\Models\Backend\UserModule\Module::orderBy('position','asc')->get() as $module )
-                    @if( can($module->key) )
-                        @if( $module->route == null )
-                            <li class="nav-item {{ get_active_module($module,Route::currentRouteName()) }}">
-                                <a href="#" class="nav-link {{ get_sub_module($module,Route::currentRouteName()) }}">
-                                    <i class="nav-icon {{ $module->icon }}"></i>
-                                    <p class="menu-item-label">{{ $module->name }}
-                                        <i class="fas fa-angle-left right"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    @foreach( $module->sub_module->sortBy('position',false) as $sub_module )
-                                        @if( can($sub_module->key) )
-                                            <li class="nav-item">
-                                                <a href="{{ route($sub_module->route) }}"
-                                                   class="nav-link {{ Route::currentRouteName()==$sub_module->route ? 'active':'' }}">
-                                                    <i class="far fa-circle nav-icon"></i>
-                                                    <p>{{ ($sub_module->name) }} </p>
-                                                </a>
-                                            </li>
-                                        @endif
-                                    @endforeach
-                                </ul>
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a href="{{ route($module->route) }}"
-                                   @if( Route::currentRouteName()==$module->route )
-                                       class="nav-link active"
-                                   @else
-                                       class="nav-link"
-                                    @endif
-                                >
-                                    <i class="nav-icon {{ $module->icon }}"></i>
-                                    <span class="nav-label">{{ $module->name }}</span>
-                                </a>
-                            </li>
-                        @endif
+                    >
+                    <i class="menu-item-icon {{ $module->icon }}"></i>
+                    <span class="menu-item-label">{{ $module->name }}</span>
+               </a>
+          </li>
+          @endif
+          @endforeach
+          @elseif( auth('web')->check() )
+          @foreach( App\Models\UserModule\Module::orderBy('position','asc')->get() as $module )
+          @if( can($module->key) )
+          @if( $module->route == null )
+          <li class="br-menu-item">
+               <a href="#" class="br-menu-link with-sub">
+                    <i class="menu-item-icon {{ $module->icon }}"></i>
+                    <span class="menu-item-label">{{ $module->name }}</span>
+               </a>
+               <ul class="br-menu-sub" @if( in_array(Route::currentRouteName(), $module->sub_module->pluck("route")->toArray()) ) style="display: block" @endif>
+                    @foreach( $module->sub_module->sortBy('position',false) as $sub_module )
+                    <li class="sub-item">
+                         <a href="{{ route($sub_module->route) }}" @if( Route::currentRouteName()==$sub_module->route )
+                              class="sub-link active"
+                              @else
+                              class="sub-link"
+                              @endif
+                              >{{ $sub_module->name }} </a>
+                    </li>
+                    @endforeach
+               </ul>
+          </li>
+          @else
+          <li class="br-menu-item">
+               <a href="{{ route($module->route) }}" @if( Route::currentRouteName()==$module->route )
+                    class="br-menu-link active"
+                    @else
+                    class="br-menu-link"
                     @endif
-                @endforeach
-            @endif
-        </ul>
-        <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-</aside>
+                    >
+                    <i class="menu-item-icon {{ $module->icon }}"></i>
+                    <span class="menu-item-label">{{ $module->name }}</span>
+               </a>
+          </li>
+          @endif
+          @endif
+          @endforeach
+          @endif
+
+
+     </ul>
+
+</div>

@@ -1,49 +1,34 @@
 <?php
 
-use App\Http\Controllers\Backend\UserModule\User\UserController;
-use App\Http\Controllers\Backend\UserModule\User\UserServiceCenterController;
-use App\Http\Controllers\Backend\UserModule\User\UserThanaController;
+use App\Http\Controllers\Backend\UserModule\User\UserCoverageController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Backend\UserModule\User\UserController;
+use App\Http\Controllers\Backend\UserModule\User\UserDebitCreditController;
 
-Route::prefix('user')->name('user.')->group(function () {
-   Route::get('/', [UserController::class, 'index'])->name('index');
-   Route::get('data', [UserController::class, 'data'])->name('data');
-   Route::get('edit/{id}', [UserController::class, 'edit'])->name('edit');
-   Route::get('create/modal', [UserController::class, 'create_modal'])->name('modal.create');
-   Route::post('create', [UserController::class, 'create'])->name('create');
-   Route::put('update/{id}', [UserController::class, 'update'])->name('update');
-   Route::get("/password-reset/modal/{user_id}", [UserController::class, 'passwordResetModal'])->name('password.reset.modal');
-   Route::post("/reset-password", [UserController::class, 'resetPassword'])->name('reset.password');
+//user start 
+    Route::group(['prefix' => 'user'], function(){
+        Route::get("/",[UserController::class,'index'])->name('user.all');
+        Route::get("/data",[UserController::class,'data'])->name('user.data');
 
-   Route::prefix('api/api-internal')->group(function () {
-      Route::post('get-service-center-by-bu', [UserController::class, 'getServiceCenterByBu'])->name("get-service-center-by-bu");
-      Route::get('search/{service_center?}/{bu?}', [UserController::class, 'index'])->name("get-service-center");
-      Route::get('get-agent-type',[UserController::class, 'getAgentType'])->name("get-agent-type");
-   });
+        //user add
+        Route::get("/add",[UserController::class,'add_modal'])->name('user.add.modal');
+        Route::post("/add",[UserController::class,'add'])->name('user.add');
 
-   // user service center
-   Route::prefix('service-center')->group(function () {
-      Route::get('{id}', [UserServiceCenterController::class, 'getUserServiceCenter'])->name("get.service.center.page");
-      Route::get('data/{id}', [UserServiceCenterController::class, 'getUserServiceCenterData'])->name("get.service.center.data");
-      Route::get('add-modal/{id}', [UserServiceCenterController::class, 'addUserServiceCenterModal'])->name("service.center.add.modal");
-      Route::post('add/{id}', [UserServiceCenterController::class, 'addUserServiceCenter'])->name("service.center.add");
-      Route::get('get-service-center-by-bu/{id}', [UserServiceCenterController::class, 'getServiceCenterByBu'])->name("service.center.by.bu");
+        //user edit
+        Route::get("/edit/{id}",[UserController::class,'edit'])->name('user.edit');
+        Route::post("/edit/{id}",[UserController::class,'update'])->name('user.update');
 
-      Route::get('delete-modal/{service_center_id}/{user_id}', [UserServiceCenterController::class, 'deleteUserServiceCenterModal'])->name("service.center.delete.modal");
-      Route::post('delete/{service_center_id}/{user_id}', [UserServiceCenterController::class, 'deleteUserServiceCenter'])->name("service.center.delete");
-   });
+        //password reset
+        Route::get("/reset/modal/{id}",[UserController::class,'reset_modal'])->name('user.reset.modal');
+        Route::post("/reset/{id}",[UserController::class,'reset'])->name('user.reset');
 
-   //user thana
-   Route::prefix('thana')->group(function () {
-      Route::get('{id}', [UserThanaController::class, 'getUserThana'])->name("get.user.thana.page");
-      Route::get('data/{id}', [UserThanaController::class, 'getUserThanaData'])->name("get.user.thana.data");
+        //password reset
+        Route::get("edit-my-profile-page",[UserController::class,'edit_my_profile_page'])->name('user.edit.my.profile.page');
+        Route::post("edit-my-profile",[UserController::class,'edit_my_profile'])->name('user.edit.my.profile');
+        Route::post("edit-my-password",[UserController::class,'edit_my_password'])->name('user.edit.my.password');
 
-      Route::get('add-modal/{id}', [UserThanaController::class, 'addUserThanaModal'])->name("thana.add.modal");
-      Route::post('add/{id}', [UserThanaController::class, 'addUserThana'])->name("thana.add");
+    }); 
+    //user end
 
-      Route::get('delete-modal/{thana_id}/{user_id}', [UserThanaController::class, 'deleteUserThanaModal'])->name("thana.delete.modal");
-      Route::post('delete/{thana_id}/{user_id}', [UserThanaController::class, 'deleteUserThana'])->name("thana.delete");
 
-   });
-
-});
+?>

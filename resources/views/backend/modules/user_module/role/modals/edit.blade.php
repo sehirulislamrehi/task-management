@@ -1,137 +1,111 @@
-<div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Role Edit</h5>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
+<div class="modal-header pd-y-20 pd-x-25">
+     <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">{{ $role->name }}</h6>
 </div>
+<div class="modal-body pd-25">
+     <form action="{{ route('role.update', $role->id) }}" method="post" class="ajax-form">
+          @csrf
+          <div class="row">
 
-<div class="modal-body">
-    <form class="ajax-form" method="post" action="{{ route('admin.user-module.role.update',['id'=>$role->id]) }}">
-        @method("PUT")
-        @csrf
-        <div class="row">
-            <!-- name -->
-            <div class=" form-group col-md-6 col-12">
-                <label for="name">Role name</label><span class="text-danger">*</span>
-                <input type="text" class="form-control" name="name" value="{{ $role->name }}">
-            </div>
+               <!-- Name -->
+               <div class="col-md-12 form-group">
+                    <label>Name</label>
+                    <input class="form-control" type="text" name="name" value="{{ $role->name }}">
+               </div>
 
-            <!-- status -->
-            <div class="form-group col-md-6 col-12">
-                <label>Active Status</label>
-                <select class="form-control" name="is_active">
-                    <option value="1" {{ $role->is_active == 1 ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ $role->is_active == 0 ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
+               <!-- status -->
+               <div class="col-md-12 col-12 form-group">
+                    <label>Status</label>
+                    <select class="form-control" name="is_active">
+                         <option value="1" @if( $role->is_active == true ) selected @endif >Active</option>
+                         <option value="0" @if( $role->is_active == false ) selected @endif >Inactive</option>
+                    </select>
+               </div>
 
-            <div class="form-group col-12">
-                <label>Permission</label>
-                <div class="form-group row">
+          </div>
+
+          <!-- permission -->
+          <div class="row">
+               <div class="col-md-3">
+
                     @foreach( $modules as $index => $module )
-                        @foreach( $module->permission as $index_2 => $module_permission )
-                            @if($module->key == $module_permission->key )
-                                <div class="permission_block card col-md-3 col-12 m-2 p-3"
-                                     style="border-radius: 10px">
-                                    <p style="
+                    @foreach( $module->permission as $index_2 => $module_permission )
+                    @if($module->key == $module_permission->key )
+                    <div class="permission_block" style="padding: 0;">
+                         <p style="
                                     border-bottom: 1px solid #e0d9d9;
                                     background: #323232;
                                     color: white;
                                     padding: 5px;
-                                    border-radius:5px;
-                                    ">
+                                ">
+                              <label>
+                                   <input type="checkbox" class="module_check" name="permission[]" value="{{ $module_permission->id }}" @php $i=0; @endphp @foreach($role->permission as $role_permission)
+                                   @if( $role_permission->id == $module_permission->id )
+                                   {{ $i++ }}
+                                   @endif
+                                   @endforeach
+
+                                   @if( $i != 0 )
+                                   checked
+                                   @endif
+                                   >
+                                   <span>{{ $module->name }}</span>
+                              </label>
+                         </p>
+                         <div class="sub_module_block">
+                              <ul>
+                                   @foreach( $module->permission as $sub_module_permission )
+                                   @if( $sub_module_permission->key != $module->key )
+                                   <p>
                                         <label>
-                                            <input type="checkbox" class="module_check" name="permission[]"
-                                                   value="{{ $module_permission->id }}"
+                                             <input type="checkbox" class="sub_module_check" name="permission[]" value="{{ $sub_module_permission->id }}" @php $j=0; @endphp @foreach( $role->permission as $role_permission )
+                                             @if( $role_permission->id == $sub_module_permission->id )
+                                             {{ $j++ }}
+                                             @endif
+                                             @endforeach
 
-                                                   @php $i=0; @endphp
-                                                   @foreach($role->permission as $role_permission)
-                                                       @if( $role_permission->id == $module_permission->id )
-                                                           {{ $i++ }}
-                                                       @endif
-                                                   @endforeach
+                                             @if( $i == 0 )
+                                             disabled
+                                             @endif
+                                             @if( $j > 0 )
+                                             checked
+                                             @endif
 
-                                                   @if( $i != 0 )
-                                                       checked
-                                                @endif
-                                            >
-                                            <span>{{ $module->name }}</span>
+                                             />
+                                             <span>{{ $sub_module_permission->display_name }}</span>
                                         </label>
-                                    </p>
-                                    <div class="sub_module_block">
-                                        <ul>
-                                            @foreach( $module->permission as $sub_module_permission )
-                                                @if( $sub_module_permission->key != $module->key )
-                                                    <p>
-                                                        <label>
-                                                            <input type="checkbox" class="sub_module_check"
-                                                                   name="permission[]"
-                                                                   value="{{ $sub_module_permission->id }}"
-
-                                                                   @php
-                                                                       $j=0;
-                                                                   @endphp
-
-                                                                   @foreach( $role->permission as $role_permission )
-                                                                       @if( $role_permission->id == $sub_module_permission->id )
-                                                                           {{ $j++ }}
-                                                                       @endif
-                                                                   @endforeach
-
-                                                                   @if( $i == 0 )
-                                                                       disabled
-                                                                   @endif
-                                                                   @if( $j > 0 )
-                                                                       checked
-                                                                @endif
-
-                                                            />
-                                                            <span>{{ $sub_module_permission->display_name }}</span>
-                                                        </label>
-                                                    </p>
-                                                @endif
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
+                                   </p>
+                                   @endif
+                                   @endforeach
+                              </ul>
+                         </div>
+                    </div>
+                    @endif
                     @endforeach
-                </div>
-            </div>
+                    @endforeach
+               </div>
+          </div>
 
-            <div class="col-md-12 form-group">
-                <button type="submit" class="btn btn-primary">
-                    Update
-                </button>
-            </div>
 
-        </div>
-    </form>
+          <div class="row">
+               <div class="col-md-12 form-layout-footer">
+                    <button type="submit" class="btn btn-info">Update</button>
+               </div>
+          </div>
+     </form>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+     <button type="button" class="btn btn-primary tx-11 tx-uppercase pd-y-12 pd-x-25 tx-mont tx-medium" data-dismiss="modal">Close</button>
 </div>
 
 <script>
-    $(".module_check").click(function (e) {
-        let $this = $(this);
-        if (e.target.checked == true) {
-            $this.closest(".permission_block").find(".sub_module_block").find(".sub_module_check").removeAttr(
-                "disabled")
-        } else {
-            $this.closest(".permission_block").find(".sub_module_block").find(".sub_module_check").attr(
-                "disabled", "disabled")
-        }
-    })
-</script>
-
-
-<link href="{{ asset('backend/css/chosen/choosen.min.css') }}" rel="stylesheet">
-<script src="{{ asset('backend/js/chosen/choosen.min.js') }}"></script>
-
-<script>
-    $(document).ready(function domReady() {
-        $(".chosen").chosen();
-    });
+     $(".module_check").click(function(e) {
+          let $this = $(this);
+          if (e.target.checked == true) {
+               $this.closest(".permission_block").find(".sub_module_block").find(".sub_module_check").removeAttr(
+                    "disabled")
+          } else {
+               $this.closest(".permission_block").find(".sub_module_block").find(".sub_module_check").attr(
+                    "disabled", "disabled")
+          }
+     })
 </script>
