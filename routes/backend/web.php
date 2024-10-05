@@ -15,6 +15,10 @@ Route::group(['prefix' => 'admindashboard', 'middleware' => 'admin_auth'], funct
         require_once "user_module/user.php";
     });
 
+    Route::group(['prefix' => 'task-module'], function(){
+        require_once "task_module/tasks.php";
+    });
+
 });
 
 ?>

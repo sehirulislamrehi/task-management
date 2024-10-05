@@ -79,6 +79,12 @@ class UserReadRepository implements UserReadInterface
 
     public function get_user_by_id($id){
         return User::where("id",$id)->select("name","email","phone","role_id","is_active","id")->first();
+    }
 
+    public function get_user_by_email($email){
+        if($email){
+            return User::where("email","LIKE","%".$email."%")->select("name","id","email")->get();
+        }
+        return [];
     }
 }

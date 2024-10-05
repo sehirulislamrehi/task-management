@@ -24,6 +24,14 @@ class ModuleSeeder extends Seeder
                 'position' => 1,
                 'route' => null
             ],
+            [
+                'id' => 2,
+                'name' => 'Task Module',
+                'key' => 'task_module',
+                'icon' => 'fas fa-tasks',
+                'position' => 2,
+                'route' => null
+            ],
         ]);
     }
 }

@@ -49,11 +49,16 @@ class UserController extends Controller
 
     public function data()
     {
-        if (can('all_user')) {
-            $user = $this->user_read_repository->get_all_user_data();
-            return $this->user_read_repository->user_datatable($user);
-        } else {
-            return unauthorized();
+        try{
+            if (can('all_user')) {
+                $user = $this->user_read_repository->get_all_user_data();
+                return $this->user_read_repository->user_datatable($user);
+            } else {
+                return unauthorized();
+            }
+        }
+        catch( Exception $e ){
+            return $e->getMessage();
         }
     }
 

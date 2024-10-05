@@ -48,6 +48,36 @@ class PermissionSedder extends Seeder
                 'display_name' => '-- Reset Password',
                 'module_id' => 1,
             ],
+            [
+                'id' => 6,
+                'key' => 'task_module',
+                'display_name' => 'Task Module',
+                'module_id' => 2,
+            ],
+            [
+                'id' => 7,
+                'key' => 'task_list',
+                'display_name' => 'Task List',
+                'module_id' => 2,
+            ],
+            [
+                'id' => 8,
+                'key' => 'add_task',
+                'display_name' => '-- Add Task',
+                'module_id' => 2,
+            ],
+            [
+                'id' => 9,
+                'key' => 'edit_task',
+                'display_name' => '-- Edit Task',
+                'module_id' => 2,
+            ],
+            [
+                'id' => 10,
+                'key' => 'delete_task',
+                'display_name' => '-- Delete Task',
+                'module_id' => 2,
+            ],
         ]);
     }
 }
