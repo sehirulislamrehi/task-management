@@ -26,6 +26,9 @@ class UserReadRepository implements UserReadInterface
     {
         return DataTables::of($user)
             ->addIndexColumn()
+            ->order(function($user) {
+                $user->orderBy('id', 'desc');  // Apply ordering here
+            })
             ->rawColumns(['action', 'is_active', 'role_id', 'image'])
             ->editColumn('image', function (User $user) {
                 if ($user->image == null) {
@@ -83,7 +86,7 @@ class UserReadRepository implements UserReadInterface
 
     public function get_user_by_email($email){
         if($email){
-            return User::where("email","LIKE","%".$email."%")->select("name","id","email")->get();
+            return User::where("email","LIKE","%".$email."%")->select("name","id","email")->take(1000)->get();
         }
         return [];
     }

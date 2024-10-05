@@ -42,6 +42,7 @@
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Status</th>
+                                    <th>Start Date</th>
                                     <th>Due Date</th>
                                     <th>Assigned To</th>
                                     <th>Assigned By</th>
@@ -100,6 +101,12 @@
                 {
                     data: 'status',
                     name: 'status',
+                    orderable: false,
+                    searchable: true
+                },
+                {
+                    data: 'start_date',
+                    name: 'start_date',
                     orderable: false,
                     searchable: true
                 },

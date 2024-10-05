@@ -28,17 +28,23 @@
                 </select>
             </div>
 
+            <!-- Start Date -->
+            <div class="col-md-6 col-12 form-group">
+                <label>Start Date</label><label class="required">*</label>
+                <input class="form-control" type="date" name="start_date">
+            </div>
+
             <!-- Due Date -->
-            <div class="col-md-12 form-group">
+            <div class="col-md-6 col-12 form-group">
                 <label>Due Date</label><label class="required">*</label>
-                <input class="form-control" type="date" name="due_date">
+                <input class="form-control" type="date" name="due_date" id="due_date">
             </div>
 
             <!-- Assigned To -->
             <div class="col-md-12 form-group">
                 <label>Assigned To</label><label class="required">*</label>
                 <img src="{{ asset('backend/images/loading.gif') }}" id="assigned-to-loader" width="15" alt="">
-                <select class="form-control chosen" id="assigned-to" name="status">
+                <select class="form-control chosen" id="assigned-to" name="assigned_to">
                     <option value="" selected disabled>Search via email</option>
                 </select>
             </div>
@@ -52,7 +58,7 @@
         </div>
         <div class="row">
             <div class="col-md-12 form-layout-footer">
-                <button type="submit" class="btn btn-info">Create</button>
+                <button type="submit" class="btn btn-info">Update</button>
             </div>
         </div>
     </form>

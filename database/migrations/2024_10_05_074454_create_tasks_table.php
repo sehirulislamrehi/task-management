@@ -17,12 +17,13 @@ return new class extends Migration
             $table->text("description");
             $table->enum('status', array_map(fn($case) => $case->value, \App\Enum\TaskStatusEnum::cases()))
                 ->comment(implode(',', array_map(fn($case) => $case->value, \App\Enum\TaskStatusEnum::cases())));
-            $table->timestamp("due_date");
+            $table->date("due_date");
             $table->unsignedBigInteger("assigned_to");
             $table->unsignedBigInteger("assigned_by");
-            $table->string("image");
-            $table->timestamp("done_at")->nullable();
-            $table->string("time_taken")->default(0);
+            $table->string("image")->nullable();
+            $table->date("start_date");
+            $table->date("done_date")->nullable();
+            $table->string("time_taken")->default(0)->comment("value stored in sec.");
             $table->timestamps();
 
             $table->foreign("assigned_to")->references("id")->on("users")->onDelete("cascade");

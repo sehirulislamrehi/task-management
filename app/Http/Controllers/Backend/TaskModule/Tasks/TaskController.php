@@ -2,31 +2,35 @@
 
 namespace App\Http\Controllers\Backend\TaskModule\Tasks;
 
-use App\Enum\TaskStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Backend\Modules\TaskModule\Task\CreateTaskRequest;
+use App\Http\Requests\Backend\Modules\TaskModule\Task\EditTaskRequest;
 use App\Interfaces\TaskModule\Tasks\TaskReadInterface;
 use App\Interfaces\TaskModule\Tasks\TaskWriteInterface;
 use App\Interfaces\UserModule\User\UserReadInterface;
+use App\Services\Backend\Modules\CommonModule\CommonService;
 use App\Services\Backend\Modules\TaskModule\TaskService;
 use App\Traits\ApiResponseTrait;
+use App\Traits\FilePathTrait;
 use Exception;
-use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     
-    use ApiResponseTrait;
+    use ApiResponseTrait, FilePathTrait;
     protected $task_read_repository;
     protected $task_write_repository;
     protected $task_service;
     protected $user_read_repository;
+    protected $common_service;
 
-    public function __construct(TaskReadInterface $task_read_interface, TaskWriteInterface $task_write_interface, TaskService $task_service, UserReadInterface $user_read_interface)
+    public function __construct(TaskReadInterface $task_read_interface, TaskWriteInterface $task_write_interface, TaskService $task_service, UserReadInterface $user_read_interface, CommonService $common_service)
     {
         $this->task_read_repository = $task_read_interface;
         $this->task_write_repository = $task_write_interface;
         $this->task_service = $task_service;
         $this->user_read_repository = $user_read_interface;
+        $this->common_service = $common_service;
     }
 
     public function index(){
@@ -87,10 +91,45 @@ class TaskController extends Controller
         }
     }
 
-    public function add(Request $request){
+    public function add(CreateTaskRequest $request){
         try{
             if(can("add_task")){
-                
+                return $this->task_write_repository->create($request);
+            }
+            else{
+                return $this->warning(null, unauthorized());
+            }
+        }
+        catch( Exception $e ){
+            return $this->error(null, $e->getMessage());
+        }
+    }
+
+    public function edit_modal($id){
+        try{
+            if(can("edit_task")){
+                $task = $this->task_read_repository->get_task_by_id($id);
+                $all_task_status = $this->task_service->get_task_status();
+                $image_link = $this->common_service->get_image_link($task->image,"task");
+                return view("backend.modules.task_module.tasks.modals.edit", compact("task","all_task_status","image_link"));
+            }
+            else{
+                return unauthorized();
+            }
+        }
+        catch( Exception $e ){
+            return $e->getMessage();
+        }
+    }
+
+    public function edit(EditTaskRequest $request, $id){
+        try{
+            if(can("edit_task")){
+                $task = $this->task_read_repository->get_task_by_id($id);
+                if(!$task){
+                    return $this->warning(null, "No task found.");
+                }
+                return $this->task_write_repository->edit($request, $task);
             }
             else{
                 return $this->warning(null, unauthorized());

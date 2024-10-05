@@ -2,6 +2,7 @@
 
 namespace App\Repositories\TaskModule\Tasks;
 
+use App\Enum\TaskStatusEnum;
 use App\Interfaces\TaskModule\Tasks\TaskReadInterface;
 use App\Models\TaskModule\Task;
 use Yajra\DataTables\Facades\DataTables;
@@ -21,21 +22,32 @@ class TaskReadRepository implements TaskReadInterface
     {
         return DataTables::of($tasks)
             ->addIndexColumn()
-            ->rawColumns(['action', 'due_date', 'assigned_to', 'assigned_by', 'created_at', 'done_at'])
+            ->order(function($tasks) {
+                $tasks->orderBy('id', 'desc');  // Apply ordering here
+            })
+            ->rawColumns(['action', 'start_date', 'due_date', 'assigned_to', 'assigned_by', 'created_at', 'done_at'])
+            ->editColumn('start_date', function (Task $task) {
+                return $task->start_date;
+            })
             ->editColumn('due_date', function (Task $task) {
-                
+                return $task->due_date;
             })
             ->editColumn('assigned_to', function (Task $task) {
-                
+                return $task->task_assigned_to->name;
             })
             ->editColumn('assigned_by', function (Task $task) {
-                
+                return $task->task_assigned_by->name;
             })
             ->editColumn('created_at', function (Task $task) {
-                
+                return $task->created_at;
             })
             ->editColumn('done_at', function (Task $task) {
-                
+                if( $task->status === TaskStatusEnum::COMPLETE->value ){
+
+                }
+                else{
+                    return "<span class='badge badge-danger'>Not Done</span>";
+                }
             })
             ->addColumn('action', function (Task $task) {
                 return '
@@ -45,17 +57,17 @@ class TaskReadRepository implements TaskReadInterface
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdown' . $task->id . '">
                     
-                        ' . (can("edit_user") ? '
-                        <a class="dropdown-item" href="#" data-content="' . route('user.edit', $task->id) . '" data-target="#myModal" class="btn btn-outline-dark" data-toggle="modal">
+                        ' . (can("edit_task") ? '
+                        <a class="dropdown-item" href="#" data-content="' . route('task.edit.modal', $task->id) . '" data-target="#myModal" class="btn btn-outline-dark" data-toggle="modal">
                             <i class="fas fa-edit"></i>
                             Edit
                         </a>
                         ' : '') . '
 
-                        ' . (can("reset_password") ? '
+                        ' . (can("delete_task") ? '
                         <a class="dropdown-item" href="#" data-content="' . route('user.reset.modal', $task->id) . '" data-target="#myModal" data-toggle="modal">
-                            <i class="fas fa-key"></i>
-                            Reset Password
+                            <i class="fas fa-trash"></i>
+                            Delete
                         </a>
                         ' : '') . '
 
@@ -64,5 +76,9 @@ class TaskReadRepository implements TaskReadInterface
                 ';
             })
             ->make(true);
+    }
+
+    public function get_task_by_id($id){
+        return Task::where("id", $id)->with("task_assigned_to","task_assigned_by")->first();
     }
 }
