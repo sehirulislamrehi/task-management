@@ -92,7 +92,7 @@
                     </div>
                     <div class="row mt-3">
                         <div class="col-12">
-                            <p class="mb-2"><strong>Note:</strong></p>
+                            <p class="mb-2"><strong>Description:</strong></p>
                             <div class="alert alert-dark" role="alert">
                             {{$task->description}}
                             </div>
