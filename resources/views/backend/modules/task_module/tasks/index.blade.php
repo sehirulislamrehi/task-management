@@ -173,6 +173,7 @@
     function clearSearch(){
         $('input').val('');
         $('select').val('').trigger('update');
+        doSearch();
     }
 </script>
 @endsection
