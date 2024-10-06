@@ -4,6 +4,7 @@ namespace App\Repositories\UserModule\User;
 
 use App\Interfaces\UserModule\User\UserReadInterface;
 use App\Models\UserModule\User;
+use App\Services\Backend\Modules\CommonModule\CommonService;
 use App\Traits\FilePathTrait;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -11,6 +12,12 @@ class UserReadRepository implements UserReadInterface
 {
 
     use FilePathTrait;
+    protected $common_service;
+
+    public function __construct(CommonService $common_service)
+    {
+        $this->common_service = $common_service;
+    }
 
     public function get_all_user_data()
     {
@@ -31,14 +38,16 @@ class UserReadRepository implements UserReadInterface
             })
             ->rawColumns(['action', 'is_active', 'role_id', 'image'])
             ->editColumn('image', function (User $user) {
+                
+
                 if ($user->image == null) {
-                    $src = asset("images/profile/user.png");
+                    $image = asset("images/profile/user.png");
                 } else {
-                    $src = asset($this->get_file_path("profile")) . '/' . $user->image;
+                    $image = $this->common_service->get_image_link($user->image,$this->get_file_path("profile"));
                 }
 
                 return "
-                    <img src='$src' width='25px' style='border-radius: 100%'>
+                    <img src='$image' width='25px' style='border-radius: 100%'>
                 ";
             })
             ->editColumn('role_id', function (User $user) {

@@ -5,13 +5,71 @@ namespace App\Repositories\TaskModule\Tasks;
 use App\Enum\TaskStatusEnum;
 use App\Interfaces\TaskModule\Tasks\TaskReadInterface;
 use App\Models\TaskModule\Task;
+use App\Services\Backend\Modules\CommonModule\CommonService;
 use Yajra\DataTables\Facades\DataTables;
 
 class TaskReadRepository implements TaskReadInterface
 {
-    public function get_all_task()
+
+    protected $common_service;
+    public function __construct(CommonService $common_service)
     {
-        return Task::orderBy("id", "desc");
+        $this->common_service = $common_service;
+    }
+
+    public function get_all_task($request)
+    {
+        $auth = auth('web')->user();
+        $query = Task::orderBy("id", "desc")->with("task_assigned_to","task_assigned_by")->where(function($query) use ($auth){
+            $query->where("assigned_to",$auth->id)->orWhere("assigned_by", $auth->id);
+        });
+
+        if( $request['task_name'] ){
+            $query->where("name","LIKE","%".$request['task_name']."%");
+        }
+
+        if( $request['status'] ){
+            $query->where("status",$request['status']);
+        }
+
+        if( $request['start_date'] && $request['due_date'] ){
+            $query->where("start_date",">=",$request['start_date']);
+            $query->where("due_date","<=",$request['due_date']);
+        }
+        elseif( $request['start_date'] ){
+            // dd("in");
+            $query->where("start_date","=",$request['start_date']);
+        }
+        elseif( $request['due_date'] ){
+            $query->where("due_date","=",$request['due_date']);
+        }
+
+        if( $request['assign_to_email'] ){
+            $query->whereHas("task_assigned_to", function($query) use ($request){
+                $query->where("email", $request['assign_to_email']);
+            });
+        }
+
+        if( $request['assign_by_email'] ){
+            $query->whereHas("task_assigned_by", function($query) use ($request){
+                $query->where("email", $request['assign_by_email']);
+            });
+        }
+
+        if( $request['created_date'] ){
+            $query->where("created_at", ">=", $request['created_date'] . ' 00:00:00');
+            $query->where("created_at", "<=", $request['created_date'] . ' 23:59:59');
+        }
+
+        if( $request['type'] && $request['type'] === "AssignedToMe" ){
+            $query->where("assigned_to",$auth->id);
+        }
+
+        if( $request['type'] && $request['type'] === "AssignedByMe" ){
+            $query->where("assigned_by", $auth->id);
+        }
+
+        return $query;
     }
     public function get_all_active_task()
     {
@@ -25,7 +83,7 @@ class TaskReadRepository implements TaskReadInterface
             ->order(function($tasks) {
                 $tasks->orderBy('id', 'desc');  // Apply ordering here
             })
-            ->rawColumns(['action', 'start_date', 'due_date', 'assigned_to', 'assigned_by', 'created_at', 'done_at'])
+            ->rawColumns(['action', 'start_date', 'due_date', 'assigned_to', 'assigned_by', 'created_at', 'time_taken'])
             ->editColumn('start_date', function (Task $task) {
                 return $task->start_date;
             })
@@ -41,13 +99,8 @@ class TaskReadRepository implements TaskReadInterface
             ->editColumn('created_at', function (Task $task) {
                 return $task->created_at;
             })
-            ->editColumn('done_at', function (Task $task) {
-                if( $task->status === TaskStatusEnum::COMPLETE->value ){
-
-                }
-                else{
-                    return "<span class='badge badge-danger'>Not Done</span>";
-                }
+            ->editColumn('time_taken', function (Task $task) {
+                return $this->common_service->convert_second_to_hour_minute($task->time_taken);
             })
             ->addColumn('action', function (Task $task) {
                 return '
@@ -65,12 +118,19 @@ class TaskReadRepository implements TaskReadInterface
                         ' : '') . '
 
                         ' . (can("delete_task") ? '
-                        <a class="dropdown-item" href="#" data-content="' . route('user.reset.modal', $task->id) . '" data-target="#myModal" data-toggle="modal">
+                        <a class="dropdown-item" href="#" data-content="' . route('task.delete.modal', $task->id) . '" data-target="#myModal" data-toggle="modal">
                             <i class="fas fa-trash"></i>
                             Delete
                         </a>
                         ' : '') . '
 
+                        ' . (can("task_list") ? '
+                        <a class="dropdown-item" href="#" data-content="' . route('task.details', $task->id) . '" data-target="#myModal" data-toggle="modal">
+                            <i class="fas fa-eye"></i>
+                            Details
+                        </a>
+                        ' : '') . '
+                        
                     </div>
                 </div>
                 ';

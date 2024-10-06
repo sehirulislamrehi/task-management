@@ -34,8 +34,12 @@
                 @endif
             </div>
             <div class="card-body table-responsive">
+                <div class="row mb-3">
+                    @include("backend.modules.task_module.tasks.widgets.search")
+                </div>
+                <hr>
                 <div class="row">
-                    <div class="col-md-12 ">
+                    <div class="col-md-12">
                         <table class="table display responsive nowrap no-footer dtr-inline collapsed custom-datatable" id="datatable">
                             <thead>
                                 <tr>
@@ -47,7 +51,7 @@
                                     <th>Assigned To</th>
                                     <th>Assigned By</th>
                                     <th>Created At</th>
-                                    <th>Done At</th>
+                                    <th>Time Taken (H:M)</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -82,6 +86,16 @@
             ajax: {
                 url: "{{ route('task.data') }}",
                 type: 'GET',
+                data: function (data) {
+                    data.task_name = $('#search-task_name').val(); 
+                    data.status = $('#search-status').val(); 
+                    data.start_date = $('#search-start_date').val(); 
+                    data.due_date = $('#search-due_date').val(); 
+                    data.assign_to_email = $('#search-assign_to_email').val(); 
+                    data.assign_by_email = $('#search-assign_by_email').val(); 
+                    data.created_date = $('#search-created_date').val(); 
+                    data.type = $('#search-type').val(); 
+                }
             },
             order: [
                 [0, 'DESC']
@@ -135,8 +149,8 @@
                     searchable: false
                 },
                 {
-                    data: 'done_at',
-                    name: 'done_at',
+                    data: 'time_taken',
+                    name: 'time_taken',
                     orderable: false,
                     searchable: false
                 },
@@ -150,5 +164,15 @@
         });
     });
 </script>
-
+<script>
+    function doSearch(){
+        $(".custom-datatable").DataTable().ajax.reload();
+    }
+</script>
+<script>
+    function clearSearch(){
+        $('input').val('');
+        $('select').val('').trigger('update');
+    }
+</script>
 @endsection

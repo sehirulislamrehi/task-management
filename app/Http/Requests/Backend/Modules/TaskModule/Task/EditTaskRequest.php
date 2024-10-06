@@ -32,7 +32,7 @@ class EditTaskRequest extends FormRequest
                ],
                'start_date' => 'required|date|after_or_equal:today',
                'due_date' => 'required|date|after_or_equal:start_date',
-               'assigned_to' => 'required|int|exists:users,id',
+               'assigned_to' => 'int|exists:users,id',
                'image' => 'file|mimes:jpg,png,jpeg,webp|max:1000'
           ];
      }

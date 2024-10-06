@@ -13,6 +13,7 @@ use App\Services\Backend\Modules\TaskModule\TaskService;
 use App\Traits\ApiResponseTrait;
 use App\Traits\FilePathTrait;
 use Exception;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -36,7 +37,8 @@ class TaskController extends Controller
     public function index(){
         try{
             if (can('task_list')) {
-                return view("backend.modules.task_module.tasks.index");
+                $all_task_status = $this->task_service->get_task_status();
+                return view("backend.modules.task_module.tasks.index", compact("all_task_status"));
             } else {
                 return view("errors.403");
             }
@@ -46,10 +48,10 @@ class TaskController extends Controller
         }
     }
 
-    public function data(){
+    public function data(Request $request){
         try{
             if (can('task_list')) {
-                $tasks = $this->task_read_repository->get_all_task();
+                $tasks = $this->task_read_repository->get_all_task($request);
                 return $this->task_read_repository->task_datatable($tasks);
             } 
             else {
@@ -109,8 +111,11 @@ class TaskController extends Controller
         try{
             if(can("edit_task")){
                 $task = $this->task_read_repository->get_task_by_id($id);
+                if(!$task){
+                    return "No task found.";
+                }
                 $all_task_status = $this->task_service->get_task_status();
-                $image_link = $this->common_service->get_image_link($task->image,"task");
+                $image_link = $this->common_service->get_image_link($task->image,$this->get_file_path("task"));
                 return view("backend.modules.task_module.tasks.modals.edit", compact("task","all_task_status","image_link"));
             }
             else{
@@ -137,6 +142,62 @@ class TaskController extends Controller
         }
         catch( Exception $e ){
             return $this->error(null, $e->getMessage());
+        }
+    }
+
+    public function delete_modal($id){
+        try{
+            if(can("delete_task")){
+                $task = $this->task_read_repository->get_task_by_id($id);
+                if(!$task){
+                    return "No task found.";
+                }
+                return view("backend.modules.task_module.tasks.modals.delete", compact("task"));
+            }
+            else{
+                return unauthorized();
+            }
+        }
+        catch( Exception $e ){
+            return $e->getMessage();
+        }
+    }
+
+    public function delete($id){
+        try{
+            if(can("delete_task")){
+                $task = $this->task_read_repository->get_task_by_id($id);
+                if(!$task){
+                    return $this->warning(null, "No task found.");
+                }
+                return $this->task_write_repository->delete($task);
+            }
+            else{
+                return $this->warning(null, unauthorized());
+            }
+        }
+        catch( Exception $e ){
+            return $this->error(null, $e->getMessage());
+        }
+    }
+
+    public function details($id){
+        try{
+            if(can("task_list")){
+                $task = $this->task_read_repository->get_task_by_id($id);
+                if(!$task){
+                    return "No task found.";
+                }
+                $image_link = $this->common_service->get_image_link($task->image,$this->get_file_path("task"));
+                $time_taken = $this->common_service->convert_second_to_hour_minute($task->time_taken);
+                return view("backend.modules.task_module.tasks.modals.details", compact("task","image_link", "time_taken"));
+            }
+            else{
+                return unauthorized();
+            }
+        }
+        catch( Exception $e ){
+            return $e->getMessage();
         }
     }
 }

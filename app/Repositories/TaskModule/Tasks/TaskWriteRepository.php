@@ -31,21 +31,17 @@ class TaskWriteRepository implements TaskWriteInterface
           $task->assigned_by = auth('web')->user()->id;
 
           $file = $request->file('image');
+          $folder = $this->get_file_path("task");
           if($file){
-               $path = $this->get_file_path("task");
                $filename = rand(00000,99999) .'_'. time() .'.'. $file->getClientOriginalExtension();
-               if( $this->common_service->file_upload($file,$filename,$path,null)){
+               if( $this->common_service->file_upload($file,$filename,$folder,null)){
                     $task->image = $filename;
                }
           }
           
-          if( $request->status === TaskStatusEnum::COMPLETE->value ){
-               $task->done_at = date("Y-m-d H:i:s");
-               $task->time_taken = 0;
-          }
-
+          $task->time_taken = $this->common_service->convert_two_date_to_second($request->start_date, $request->due_date);
           $task->save();
-          return $this->success(null, "Task saved");
+          return $this->success(null, "Task Created");
      }
 
      public function edit($request, $task){
@@ -55,24 +51,36 @@ class TaskWriteRepository implements TaskWriteInterface
           $task->status = $request->status;
           $task->start_date = $request->start_date;
           $task->due_date = $request->due_date;
-          $task->assigned_to = $request->assigned_to;
-          $task->assigned_by = auth('web')->user()->id;
+
+          if($request->assigned_to){
+               $task->assigned_to = $request->assigned_to;
+          }
 
           $file = $request->file('image');
+          $folder = $this->get_file_path("task");
+
           if($file){
-               $path = $this->get_file_path("task");
                $filename = rand(00000,99999) .'_'. time() .'.'. $file->getClientOriginalExtension();
-               if( $this->common_service->file_upload($file,$filename,$path,null)){
+               // return $this->common_service->file_upload($file,$filename,$folder,null);
+               if( $this->common_service->file_upload($file,$filename,$folder,null) ){
                     $task->image = $filename;
                }
           }
-          
-          if( $request->status === TaskStatusEnum::COMPLETE->value ){
-               $task->done_at = date("Y-m-d H:i:s");
-               $task->time_taken = 0;
-          }
 
+          if( $request->is_attachment_remove ){
+               $this->common_service->remove_file($folder,$task->image,"public");
+               $task->image = null;
+          }
+          
+          $task->time_taken = $this->common_service->convert_two_date_to_second($request->start_date, $request->due_date);
           $task->save();
-          return $this->success(null, "Task saved");
+          return $this->success(null, "Task Updated");
+     }
+
+     public function delete($task){
+          $folder = $this->get_file_path("task");
+          $this->common_service->remove_file($folder,$task->image,"public");
+          $task->delete();
+          return $this->success(null, "Task Removed");
      }
 }

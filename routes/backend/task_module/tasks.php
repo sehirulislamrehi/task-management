@@ -13,6 +13,11 @@ Route::group(['prefix' => 'task-module'], function () {
     Route::get("edit-modal/{id}", [TaskController::class, 'edit_modal'])->name('task.edit.modal');
     Route::post("edit/{id}", [TaskController::class, 'edit'])->name('task.edit');
 
+    Route::get("delete-modal/{id}", [TaskController::class, 'delete_modal'])->name('task.delete.modal');
+    Route::post("delete/{id}", [TaskController::class, 'delete'])->name('task.delete');
+
+    Route::get("details/{id}", [TaskController::class, 'details'])->name('task.details');
+
     Route::get("get-user-by-email/{email?}", [TaskController::class, 'get_user_by_email'])->name('task.get.user.by.email');
 });
 //user end

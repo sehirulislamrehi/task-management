@@ -2,7 +2,7 @@
      <h6 class="tx-14 mg-b-0 tx-uppercase tx-inverse tx-bold">{{ $task->name }}</h6>
 </div>
 <div class="modal-body pd-25">
-     <form action="{{ route('task.add') }}" method="post" class="ajax-form" enctype="multipart/form-data">
+     <form action="{{ route('task.edit', $task->id) }}" method="post" class="ajax-form" enctype="multipart/form-data">
           @csrf
           <div class="row">
 
@@ -60,11 +60,15 @@
                     <label>Image</label>
                     <input class="form-control-file" type="file" name="image">
                </div>
+               <div class="col-md-12 form-group">
+                    <label><small>Please check if you want to remove the attachment</small></label>
+                    <input class="form-control-check" type="checkbox" value="1" name="is_attachment_remove">
+               </div>
 
           </div>
           <div class="row">
                <div class="col-md-12 form-layout-footer">
-                    <button type="submit" class="btn btn-info">Create</button>
+                    <button type="submit" class="btn btn-info">Update</button>
                </div>
           </div>
      </form>
