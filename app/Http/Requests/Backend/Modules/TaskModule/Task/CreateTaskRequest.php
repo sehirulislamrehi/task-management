@@ -30,7 +30,7 @@ class CreateTaskRequest extends FormRequest
                     "required",
                     Rule::enum(TaskStatusEnum::class)
                ],
-               'start_date' => 'required|date|after_or_equal:today',
+               'start_date' => 'required|date',
                'due_date' => 'required|date|after_or_equal:start_date',
                'assigned_to' => 'required|int|exists:users,id',
                'image' => 'file|mimes:jpg,png,jpeg,webp|max:1000'

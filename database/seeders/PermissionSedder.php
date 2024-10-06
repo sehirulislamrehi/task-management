@@ -78,6 +78,12 @@ class PermissionSedder extends Seeder
                 'display_name' => '-- Delete Task',
                 'module_id' => 2,
             ],
+            [
+                'id' => 11,
+                'key' => 'roles',
+                'display_name' => 'Roles',
+                'module_id' => 1,
+            ],
         ]);
     }
 }

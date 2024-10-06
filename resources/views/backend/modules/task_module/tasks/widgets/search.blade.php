@@ -50,7 +50,7 @@
 <div class="col-md-2 form-group">
     <label>Type</label>
     <select class="form-control" id="search-type">
-        <option value="">All Ticket</option>
+        <option value="">All Task</option>
         <option value="AssignedToMe">Assigned To Me</option>
         <option value="AssignedByMe">Assigned By Me</option>
     </select>

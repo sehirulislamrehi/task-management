@@ -21,12 +21,14 @@ class UserReadRepository implements UserReadInterface
 
     public function get_all_user_data()
     {
-        return User::orderBy('id', 'desc')->select("id", "name", "email", "phone", "is_active", "role_id", "image")->with("role");
+        $auth = auth('web')->user();
+        return User::orderBy('id', 'desc')->select("id", "name", "email", "phone", "is_active", "role_id", "image")->where("id","!=",$auth->id)->with("role");
     }
 
     public function get_active_user_data()
     {
-        return User::orderBy('id', 'desc')->select("id", "name", "email", "phone", "is_active", "role_id", "image")->where("is_active", true)->with("role");
+        $auth = auth('web')->user();
+        return User::orderBy('id', 'desc')->select("id", "name", "email", "phone", "is_active", "role_id", "image")->where("id","!=",$auth->id)->where("is_active", true)->with("role");
     }
 
     public function user_datatable($user)
