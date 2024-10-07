@@ -2,7 +2,6 @@
 
 namespace App\Repositories\TaskModule\Tasks;
 
-use App\Enum\TaskStatusEnum;
 use App\Interfaces\TaskModule\Tasks\TaskWriteInterface;
 use App\Models\TaskModule\Task;
 use App\Services\Backend\Modules\CommonModule\CommonService;
@@ -61,7 +60,6 @@ class TaskWriteRepository implements TaskWriteInterface
 
           if($file){
                $filename = rand(00000,99999) .'_'. time() .'.'. $file->getClientOriginalExtension();
-               // return $this->common_service->file_upload($file,$filename,$folder,null);
                if( $this->common_service->file_upload($file,$filename,$folder,null) ){
                     $task->image = $filename;
                }

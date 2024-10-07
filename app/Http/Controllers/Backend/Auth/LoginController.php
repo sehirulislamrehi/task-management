@@ -7,6 +7,7 @@ use App\Services\Backend\Auth\AuthenticationService;
 use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
@@ -23,6 +24,7 @@ class LoginController extends Controller
 
     public function index(){
         if (auth('web')->check()) {
+            Artisan::call("storage:link");
             return redirect()->route("dashboard");
         } else {
             return view("backend.auth.login");

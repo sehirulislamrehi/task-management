@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 06, 2024 at 07:22 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Oct 07, 2024 at 06:37 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -200,16 +200,16 @@ CREATE TABLE `permission_role` (
 --
 
 INSERT INTO `permission_role` (`id`, `role_id`, `permission_id`, `created_at`, `updated_at`) VALUES
-(124, 1, 1, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(125, 1, 2, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(126, 1, 3, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(127, 1, 4, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(128, 1, 5, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(129, 1, 6, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(130, 1, 7, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(131, 1, 8, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(132, 1, 9, '2024-10-06 11:21:21', '2024-10-06 11:21:21'),
-(133, 1, 10, '2024-10-06 11:21:21', '2024-10-06 11:21:21');
+(1, 1, 1, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(2, 1, 2, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(3, 1, 3, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(4, 1, 4, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(5, 1, 5, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(6, 1, 6, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(7, 1, 7, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(8, 1, 8, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(9, 1, 9, '2024-10-06 21:53:45', '2024-10-06 21:53:45'),
+(10, 1, 10, '2024-10-06 21:53:45', '2024-10-06 21:53:45');
 
 -- --------------------------------------------------------
 
@@ -230,7 +230,7 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Admin', 1, '2024-10-06 09:03:26', '2024-10-06 09:03:26');
+(1, 'Admin', 1, '2024-10-06 21:53:45', '2024-10-06 21:53:45');
 
 -- --------------------------------------------------------
 
@@ -252,8 +252,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('62oSclwIfg7uuhkes8vepNOFsoU6moLMSRVRvjnx', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiOXRKWHdOYTJvQWVIVUlMVTVMbXVpNnlqQ0pJdXFzQmZWc2dvNHFwSCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6OTk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbmRhc2hib2FyZC9yZXBvcnQtbW9kdWxlL2Rhc2hib2FyZC1yZXBvcnQvaGlnaGVzdC1hdmVyYWdlLXRpbWUtdGFrZW4tdXNlciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1728235356),
-('TWY3MeNn9ltV6k02ugsW1w49NMfb4UGJm7f4V4Td', 2, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZlVWVFlWSnhJQXVsb2hMUERJTE1RUXdPc29SUm9WeXAyTEE2NFQwaSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6OTk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbmRhc2hib2FyZC9yZXBvcnQtbW9kdWxlL2Rhc2hib2FyZC1yZXBvcnQvaGlnaGVzdC1hdmVyYWdlLXRpbWUtdGFrZW4tdXNlciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjI7fQ==', 1728235323);
+('82SqxfpNZg4Qd9OqR0yoKyQ7txZZOoknTCPHqZJh', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoibFpIbHpsRkQzcThLeW83cG1uZndIN3dwR0Q3RVQ5ZFU0eXN6SlRCUCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6OTk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMS9hZG1pbmRhc2hib2FyZC9yZXBvcnQtbW9kdWxlL2Rhc2hib2FyZC1yZXBvcnQvaGlnaGVzdC1hdmVyYWdlLXRpbWUtdGFrZW4tdXNlciI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE7fQ==', 1728275804);
 
 -- --------------------------------------------------------
 
@@ -307,10 +306,13 @@ CREATE TABLE `tasks` (
 --
 
 INSERT INTO `tasks` (`id`, `name`, `description`, `status`, `start_date`, `due_date`, `time_taken`, `assigned_to`, `assigned_by`, `image`, `created_at`, `updated_at`) VALUES
-(1, 'Add to cart functionality', 'Add to cart functionality', 'Complete', '2024-10-05', '2024-10-06', '86400', 1, 1, NULL, '2024-10-06 09:18:43', '2024-10-06 11:08:13'),
-(2, 'Order Place functionality', 'Order Place functionality', 'Complete', '2024-10-03', '2024-10-05', '172800', 3, 1, NULL, '2024-10-06 09:19:07', '2024-10-06 11:15:32'),
-(3, 'APP ui development', 'APP ui development', 'Complete', '2024-10-01', '2024-10-02', '86400', 2, 1, '25272_1728228019.jpg', '2024-10-06 09:19:27', '2024-10-06 11:07:17'),
-(4, 'APP search function', 'APP search function', 'Pending', '2024-10-01', '2024-10-04', '259200', 4, 1, NULL, '2024-10-06 09:19:45', '2024-10-06 11:07:08');
+(1, 'Add to cart functionality', 'Add to cart functionality', 'Pending', '2024-09-09', '2024-09-12', '259200', 2, 1, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(2, 'Order Place functionality', 'Order Place functionality', 'Pending', '2024-09-22', '2024-09-26', '345600', 3, 2, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(3, 'APP ui development', 'APP ui development', 'Complete', '2024-09-07', '2024-09-17', '864000', 4, 1, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(4, 'Push notification development', 'Push notification development', 'Complete', '2024-09-20', '2024-09-21', '86400', 1, 2, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(5, 'Point system', 'Point system', 'Complete', '2024-10-06', '2024-10-06', '0', 4, 3, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(6, 'Role management development', 'Role management development', 'Complete', '2024-09-24', '2024-10-06', '1036800', 3, 4, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29'),
+(7, 'EMI functionality development', 'EMI functionality development', 'In-Progress', '2024-09-19', '2024-09-19', '0', 2, 4, NULL, '2024-10-06 21:55:29', '2024-10-06 21:55:29');
 
 -- --------------------------------------------------------
 
@@ -338,10 +340,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `image`, `password`, `role_id`, `is_active`, `is_super_admin`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Md. Sehirul Islam Rehi', 'mdsehirulislamrehi@gmail.com', '01858361812', NULL, '$2y$12$/5V2XRxGxhuQt.UXaoQAXOoJuPOnjNWRVISJsTK3FdmlVIxlIh6py', NULL, 1, 1, NULL, NULL, NULL),
-(2, 'Forkan', 'forkan@gmail.com', '11111111111', NULL, '$2y$12$DPkWYHyJxvLV9aYOYsu0pOlmBtWE6LmFAHssYnMbUbz1SnP6O2I3e', 1, 1, 0, 'J1EB6YoBn1H0iVlD9yi4uPCVHkqeTrqIYBtFzwIJKIkBiCYDtmzFf28n7qgP', '2024-10-06 09:03:44', '2024-10-06 09:03:44'),
-(3, 'Hasan', 'hasan@gmail.com', '11111111111', NULL, '$2y$12$bjn/z/zlNa18CP1IGWaiZ./wPvKkX5NHJsmMwjmp8c810P54FqQV.', 1, 1, 0, NULL, '2024-10-06 09:03:50', '2024-10-06 09:03:50'),
-(4, 'Shuvo', 'shuvo@gmail.com', '11111111111', NULL, '$2y$12$2ThjUfO9uQKeDZJWmCdCWeyDp9/hQO0G7xkLMn4yw0EqoC5Np./pa', 1, 1, 0, NULL, '2024-10-06 09:03:58', '2024-10-06 09:03:58');
+(1, 'Md Sehirul Islam Rehi', 'mdsehirulislamrehi@gmail.com', '01858361812', NULL, '$2y$12$NJT6MJ2VKZifxk6sxAE12e2.aDm4vLCTG21pw.1QZf0Idu8YjXCz.', NULL, 1, 1, 'PTBMbBQuqMM9JuqnLgnpIN54MttWP5citZmiy2ccTOtFpM5U4kXyZhI03pNn', NULL, NULL),
+(2, 'Md Shuvo', 'shuvo@gmail.com', '017xxxxxxxx', NULL, '$2y$12$P2Pr.0WO75zkKsgPQ1Ps9eR67QaYkWD2jQBO9nTYcAKAUozo2MkRu', 1, 1, 0, NULL, NULL, NULL),
+(3, 'Md Forkan', 'forkan@gmail.com', '017xxxxxxxx', NULL, '$2y$12$jv2O/DkSxzxRauBItiOD/eh9sofcr4xeFX0jtG9MXhsZB4MPFthx.', 1, 1, 0, NULL, NULL, NULL),
+(4, 'Md Hasan', 'hasan@gmail.com', '017xxxxxxxx', NULL, '$2y$12$Zuj/8bL/AnVRoWCNFl5/Ner4//mhsb7e.lup3XuuNLqW1zaVzT39i', 1, 1, 0, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -487,7 +489,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `permission_role`
 --
 ALTER TABLE `permission_role`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=134;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -505,7 +507,7 @@ ALTER TABLE `sub_modules`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`

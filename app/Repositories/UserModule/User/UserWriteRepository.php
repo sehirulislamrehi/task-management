@@ -7,9 +7,7 @@ use App\Models\UserModule\User;
 use App\Services\Backend\Modules\CommonModule\CommonService;
 use App\Traits\ApiResponseTrait;
 use App\Traits\FilePathTrait;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserWriteRepository implements UserWriteInterface
 {
