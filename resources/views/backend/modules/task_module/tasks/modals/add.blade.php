@@ -51,7 +51,7 @@
 
             <!-- Image -->
             <div class="col-md-12 form-group">
-                <label>Image</label>
+                <label>Image <small>(Max file size: 1mb. Allowed type: .jpg, .jpeg, .png, .webp)</small></label>
                 <input class="form-control-file" type="file" name="image">
             </div>
 

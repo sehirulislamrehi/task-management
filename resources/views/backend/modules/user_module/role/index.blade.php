@@ -82,16 +82,21 @@
                 },
                 {
                     data: 'name',
-                    name: 'name'
+                    name: 'name',
+                    orderable: false,
+                    searchable: true
                 },
                 {
                     data: 'is_active',
-                    name: 'is_active'
+                    name: 'is_active',
+                    orderable: false,
+                    searchable: true
                 },
                 {
                     data: 'action',
                     name: 'action',
                     orderable: false,
+                    searchable: false
                 },
             ]
         });

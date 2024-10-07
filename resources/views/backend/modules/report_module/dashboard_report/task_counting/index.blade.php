@@ -43,7 +43,7 @@
                <div class="col-md-3 col-6">
                     <div class="card card-total" style="background: #bce1fd;">
                          <div class="card-body">
-                              <h5>Total Last 30 Days</h5>
+                              <h5>Last 30 Days Task</h5>
                               <div class="d-flex justify-content-between align-items-center">
                                    <div class="icon pr-1">
                                    <div id="total_task" class="pl-0 calling-font">Loading...</div>

@@ -80,7 +80,7 @@
 
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label>Email</label>
+                        <label style="color: white;">Email</label>
                         <input type="text" name="email" class="form-control" placeholder="Enter your email">
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                     <div class="form-group col-md-12 password-box">
                         <i class="fas fa-eye show-password"></i>
                         <i class="fas fa-eye-slash hide-password"></i>
-                        <label>Password</label>
+                        <label style="color: white;">Password</label>
                         <input type="password" name="password" class="form-control" placeholder="Password" id="password-field">
                     </div>
                 </div>

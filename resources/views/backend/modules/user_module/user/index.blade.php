@@ -89,7 +89,7 @@
                     data: 'image',
                     name: 'image',
                     orderable: false,
-                    searchable: true
+                    searchable: false
                 },
                 {
                     data: 'name',

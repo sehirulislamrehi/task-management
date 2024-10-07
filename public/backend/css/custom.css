@@ -178,5 +178,23 @@ button{
     border-radius: 30px!important;
 }
 .card{
-    border-radius: 20px!important;
+    border-radius: 10px!important;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.125), 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+table.dataTable.display tbody tr.odd > .sorting_1, table.dataTable.order-column.stripe tbody tr.odd > .sorting_1{
+    background-color: unset!important;
+}
+table.dataTable.display tbody tr:hover > .sorting_1, table.dataTable.order-column.hover tbody tr:hover > .sorting_1{
+    background-color: unset!important;
+}
+table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd{
+    background-color: unset!important;
+}
+.table th, .table td{
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6!important;
+}
+table.dataTable{
+    border: unset!important;
 }

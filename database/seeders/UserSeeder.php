@@ -14,11 +14,11 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::statement("DELETE FROM users WHERE id = 1");
+        DB::statement("DELETE FROM users");
         DB::table('users')->insert([
             [
                 'id' => 1,
-                'name' => "Md. Sehirul Islam Rehi",
+                'name' => "Md Sehirul Islam Rehi",
                 'email' => "mdsehirulislamrehi@gmail.com",
                 'phone' => "01858361812",
                 'image' => null,
@@ -26,6 +26,40 @@ class UserSeeder extends Seeder
                 'role_id' => null,
                 'is_active' => true,
                 'is_super_admin' => true,
+            ],
+            [
+                'id' => 2,
+                'name' => "Md Shuvo",
+                'email' => "shuvo@gmail.com",
+                'phone' => "017xxxxxxxx",
+                'image' => null,
+                'password' => Hash::make("123456"),
+                'role_id' => 1,
+                'is_active' => true,
+                'is_super_admin' => false,
+            ],
+
+            [
+                'id' => 3,
+                'name' => "Md Forkan",
+                'email' => "forkan@gmail.com",
+                'phone' => "017xxxxxxxx",
+                'image' => null,
+                'password' => Hash::make("123456"),
+                'role_id' => 1,
+                'is_active' => true,
+                'is_super_admin' => false,
+            ],
+            [
+                'id' => 4,
+                'name' => "Md Hasan",
+                'email' => "hasan@gmail.com",
+                'phone' => "017xxxxxxxx",
+                'image' => null,
+                'password' => Hash::make("123456"),
+                'role_id' => 1,
+                'is_active' => true,
+                'is_super_admin' => false,
             ],
         ]);
     }
