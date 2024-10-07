@@ -22,9 +22,14 @@ class TaskReadRepository implements TaskReadInterface
     public function get_all_task($request)
     {
         $auth = auth('web')->user();
-        $query = Task::orderBy("id", "desc")->with("task_assigned_to", "task_assigned_by")->where(function ($query) use ($auth) {
-            $query->where("assigned_to", $auth->id)->orWhere("assigned_by", $auth->id);
-        });
+
+        $query = Task::orderBy("id", "desc")->with("task_assigned_to", "task_assigned_by");
+
+        if( $auth->is_super_admin == false ){
+            $query->where(function ($query) use ($auth) {
+                $query->where("assigned_to", $auth->id)->orWhere("assigned_by", $auth->id);
+            });
+        }
 
         if ($request['task_name']) {
             $query->where("name", "LIKE", "%" . $request['task_name'] . "%");
